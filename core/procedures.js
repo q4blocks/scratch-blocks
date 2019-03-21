@@ -32,7 +32,6 @@ goog.provide('Blockly.Procedures');
 
 goog.require('Blockly.Blocks');
 goog.require('Blockly.constants');
-goog.require('Blockly.Events.BlockChange');
 goog.require('Blockly.Field');
 goog.require('Blockly.Names');
 goog.require('Blockly.Workspace');
@@ -108,7 +107,13 @@ Blockly.Procedures.sortProcedureMutations_ = function(mutations) {
     var procCodeA = a.getAttribute('proccode');
     var procCodeB = b.getAttribute('proccode');
 
-    return Blockly.scratchBlocksUtils.compareStrings(procCodeA, procCodeB);
+    if (procCodeA < procCodeB) {
+      return -1;
+    } else if (procCodeA > procCodeB) {
+      return 1;
+    } else {
+      return 0;
+    }
   });
 
   return newMutations;
@@ -123,7 +128,7 @@ Blockly.Procedures.sortProcedureMutations_ = function(mutations) {
  * @private
  */
 Blockly.Procedures.procTupleComparator_ = function(ta, tb) {
-  return Blockly.scratchBlocksUtils.compareStrings(ta[0], tb[0]);
+  return ta[0].toLowerCase().localeCompare(tb[0].toLowerCase());
 };
 
 /**
@@ -282,7 +287,7 @@ Blockly.Procedures.getCallers = function(name, ws, definitionRoot,
     if (block.id == definitionRoot.id && !allowRecursive) {
       continue;
     }
-    allBlocks.push.apply(allBlocks, block.getDescendants(false));
+    allBlocks.push.apply(allBlocks, block.getDescendants());
   }
 
   var callers = [];
@@ -374,7 +379,7 @@ Blockly.Procedures.getPrototypeBlock = function(procCode, workspace) {
 Blockly.Procedures.newProcedureMutation = function() {
   var mutationText = '<xml>' +
       '<mutation' +
-      ' proccode="' + Blockly.Msg['PROCEDURE_DEFAULT_NAME'] + '"' +
+      ' proccode="block name"' +
       ' argumentids="[]"' +
       ' argumentnames="[]"' +
       ' argumentdefaults="[]"' +
@@ -417,16 +422,7 @@ Blockly.Procedures.createProcedureCallbackFactory_ = function(workspace) {
       var blockDom = Blockly.Xml.textToDom(blockText).firstChild;
       Blockly.Events.setGroup(true);
       var block = Blockly.Xml.domToBlock(blockDom, workspace);
-      var scale = workspace.scale; // To convert from pixel units to workspace units
-      // Position the block so that it is at the top left of the visible workspace,
-      // padded from the edge by 30 units. Position in the top right if RTL.
-      var posX = -workspace.scrollX;
-      if (workspace.RTL) {
-        posX += workspace.getMetrics().contentWidth - 30;
-      } else {
-        posX += 30;
-      }
-      block.moveBy(posX / scale, (-workspace.scrollY + 30) / scale);
+      block.moveBy(30, 30);
       block.scheduleSnapAndBump();
       Blockly.Events.setGroup(false);
     }

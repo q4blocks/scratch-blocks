@@ -581,7 +581,7 @@ Blockly.Blocks['looks_nextbackdrop'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.LOOKS_NEXTBACKDROP_BLOCK,
+      "message0": Blockly.Msg.LOOKS_NEXTBACKDROP,
       "category": Blockly.Categories.looks,
       "extensions": ["colours_looks", "shape_statement"]
     });

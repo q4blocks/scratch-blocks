@@ -27,7 +27,7 @@
 goog.provide('Blockly.InsertionMarkerManager');
 
 goog.require('Blockly.BlockAnimations');
-goog.require('Blockly.Events.BlockMove');
+goog.require('Blockly.Events');
 goog.require('Blockly.RenderedConnection');
 
 goog.require('goog.math.Coordinate');
@@ -257,9 +257,7 @@ Blockly.InsertionMarkerManager.prototype.createMarkerBlock_ = function(sourceBlo
     result.setInsertionMarker(true, sourceBlock.width);
     if (sourceBlock.mutationToDom) {
       var oldMutationDom = sourceBlock.mutationToDom();
-      if (oldMutationDom) {
-        result.domToMutation(oldMutationDom);
-      }
+      result.domToMutation(oldMutationDom);
     }
     result.initSvg();
   } finally {

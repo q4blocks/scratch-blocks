@@ -13,22 +13,10 @@ common.pyc
 *.komodoproject
 /nbproject/private/
 
-# Unused by scratch-blocks
-dart_compressed.js
-javascript_compressed.js
-lua_compressed.js
-php_compressed.js
-python_compressed.js
-
-# Editor
-.vscode
-
 /accessible/*
 /dist
-/msg/js/*
-!/msg/js/en.js
-/msg/json/*
-!/msg/json/en.json
+/msg/json/synonyms.json
+/msg/json/qqq.json
 /blockly_compressed_horizontal.js
 /blockly_compressed_vertical.js
 /blockly_uncompressed_horizontal.js
@@ -43,4 +31,3 @@ python_compressed.js
 /gh-pages/_site
 /*compiler*.jar
 /local_blockly_compressed_vertical.js
-/chromedriver
