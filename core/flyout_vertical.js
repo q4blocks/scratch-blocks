@@ -205,25 +205,10 @@ Blockly.VerticalFlyout.prototype.getMetrics_ = function() {
   var viewHeight = this.height_ - 2 * this.SCROLLBAR_PADDING;
   var viewWidth = this.getWidth() - this.SCROLLBAR_PADDING;
 
-  // Add padding to the bottom of the flyout, so we can scroll to the top of
-  // the last category.
-  var contentHeight = optionBox.height * this.workspace_.scale;
-  this.recordCategoryScrollPositions_();
-  var bottomPadding = this.MARGIN;
-  if (this.categoryScrollPositions.length > 0) {
-    var lastLabel = this.categoryScrollPositions[
-        this.categoryScrollPositions.length - 1];
-    var lastPos = lastLabel.position * this.workspace_.scale;
-    var lastCategoryHeight = contentHeight - lastPos;
-    if (lastCategoryHeight < viewHeight) {
-      bottomPadding = viewHeight - lastCategoryHeight;
-    }
-  }
-
   var metrics = {
     viewHeight: viewHeight,
     viewWidth: viewWidth,
-    contentHeight: contentHeight + bottomPadding,
+    contentHeight: optionBox.height * this.workspace_.scale + 2 * this.MARGIN,
     contentWidth: optionBox.width * this.workspace_.scale + 2 * this.MARGIN,
     viewTop: -this.workspace_.scrollY + optionBox.y,
     viewLeft: -this.workspace_.scrollX,
@@ -452,7 +437,7 @@ Blockly.VerticalFlyout.prototype.layout_ = function(contents, gaps) {
   for (var i = 0, item; item = contents[i]; i++) {
     if (item.type == 'block') {
       var block = item.block;
-      var allBlocks = block.getDescendants(false);
+      var allBlocks = block.getDescendants();
       for (var j = 0, child; child = allBlocks[j]; j++) {
         // Mark blocks as being inside a flyout.  This is used to detect and
         // prevent the closure of the flyout if the user right-clicks on such a
@@ -490,11 +475,7 @@ Blockly.VerticalFlyout.prototype.layout_ = function(contents, gaps) {
     } else if (item.type == 'button') {
       var button = item.button;
       var buttonSvg = button.createDom();
-      if (this.RTL) {
-        button.moveTo(flyoutWidth - this.MARGIN - button.width, cursorY);
-      } else {
-        button.moveTo(cursorX, cursorY);
-      }
+      button.moveTo(cursorX, cursorY);
       button.show();
       // Clicking on a flyout button or label is a lot like clicking on the
       // flyout background.
@@ -665,11 +646,6 @@ Blockly.VerticalFlyout.prototype.isDragTowardWorkspace = function(currentDragDel
 
 /**
  * Return the deletion rectangle for this flyout in viewport coordinates.
- * Deletion area is the height of the flyout, but extends to the left (in LTR)
- * by a lot in order to allow for deleting blocks when dragged beyond the left
- * window edge. In RTL, the delete area extends off to the right.
- * The top/bottom do not extend to allow dragging blocks outside of the workspace
- * to be dropped (e.g. to the backpack).
  * @return {goog.math.Rect} Rectangle in which to delete.
  */
 Blockly.VerticalFlyout.prototype.getClientRect = function() {
@@ -683,14 +659,13 @@ Blockly.VerticalFlyout.prototype.getClientRect = function() {
   // but be smaller than half Number.MAX_SAFE_INTEGER (not available on IE).
   var BIG_NUM = 1000000000;
   var x = flyoutRect.left;
-  var y = flyoutRect.top;
   var width = flyoutRect.width;
-  var height = flyoutRect.height;
 
   if (this.toolboxPosition_ == Blockly.TOOLBOX_AT_LEFT) {
-    return new goog.math.Rect(x - BIG_NUM, y, BIG_NUM + width, height);
+    return new goog.math.Rect(x - BIG_NUM, -BIG_NUM, BIG_NUM + width,
+        BIG_NUM * 2);
   } else {  // Right
-    return new goog.math.Rect(x, y, BIG_NUM + width, height);
+    return new goog.math.Rect(x, -BIG_NUM, BIG_NUM + width, BIG_NUM * 2);
   }
 };
 

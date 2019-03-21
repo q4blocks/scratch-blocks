@@ -30,8 +30,6 @@
  */
 goog.provide('Blockly.ContextMenu');
 
-goog.require('Blockly.Events.BlockCreate');
-goog.require('Blockly.scratchBlocksUtils');
 goog.require('Blockly.utils');
 goog.require('Blockly.utils.uiMenu');
 
@@ -40,7 +38,6 @@ goog.require('goog.events');
 goog.require('goog.style');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
-goog.require('goog.userAgent');
 
 
 /**
@@ -215,13 +212,12 @@ Blockly.ContextMenu.callbackFactory = function(block, xml) {
  */
 Blockly.ContextMenu.blockDeleteOption = function(block) {
   // Option to delete this block but not blocks lower in the stack.
-  // Count the number of blocks that are nested in this block,
-  // ignoring shadows and without ordering.
-  var descendantCount = block.getDescendants(false, true).length;
+  // Count the number of blocks that are nested in this block.
+  var descendantCount = block.getDescendants(true).length;
   var nextBlock = block.getNextBlock();
   if (nextBlock) {
     // Blocks in the current stack would survive this block's deletion.
-    descendantCount -= nextBlock.getDescendants(false, true).length;
+    descendantCount -= nextBlock.getDescendants(true).length;
   }
   var deleteOption = {
     text: descendantCount == 1 ? Blockly.Msg.DELETE_BLOCK :
@@ -257,17 +253,14 @@ Blockly.ContextMenu.blockHelpOption = function(block) {
 /**
  * Make a context menu option for duplicating the current block.
  * @param {!Blockly.BlockSvg} block The block where the right-click originated.
- * @param {boolean} isMouseEvent True if the event that caused the context
- *     menu to open came from a mouse.  False if touch.
  * @return {!Object} A menu option, containing text, enabled, and a callback.
  * @package
  */
-Blockly.ContextMenu.blockDuplicateOption = function(block, isMouseEvent) {
+Blockly.ContextMenu.blockDuplicateOption = function(block) {
   var duplicateOption = {
-    text: Blockly.Msg.DUPLICATE,
+    text: Blockly.Msg.DUPLICATE_BLOCK,
     enabled: true,
-    callback:
-        Blockly.scratchBlocksUtils.duplicateAndDragCallback(block, isMouseEvent)
+    callback: block.duplicateAndDragCallback_()
   };
   return duplicateOption;
 };
@@ -293,7 +286,7 @@ Blockly.ContextMenu.blockCommentOption = function(block) {
     // If there's no comment, add an option to create a comment.
     commentOption.text = Blockly.Msg.ADD_COMMENT;
     commentOption.callback = function() {
-      block.setCommentText(Blockly.Msg.WORKSPACE_COMMENT_DEFAULT_TEXT);
+      block.setCommentText('');
     };
   }
   return commentOption;
@@ -407,114 +400,6 @@ Blockly.ContextMenu.wsExpandOption = function(hasCollapsedBlocks, topBlocks) {
       Blockly.ContextMenu.toggleCollapseFn_(topBlocks, false);
     }
   };
-};
-
-/**
- * Make a context menu option for deleting the current workspace comment.
- * @param {!Blockly.WorkspaceCommentSvg} comment The workspace comment where the
- *     right-click originated.
- * @return {!Object} A menu option, containing text, enabled, and a callback.
- * @package
- */
-Blockly.ContextMenu.commentDeleteOption = function(comment) {
-  var deleteOption = {
-    text: Blockly.Msg.DELETE,
-    enabled: true,
-    callback: function() {
-      Blockly.Events.setGroup(true);
-      comment.dispose(true, true);
-      Blockly.Events.setGroup(false);
-    }
-  };
-  return deleteOption;
-};
-
-/**
- * Make a context menu option for duplicating the current workspace comment.
- * @param {!Blockly.WorkspaceCommentSvg} comment The workspace comment where the
- *     right-click originated.
- * @return {!Object} A menu option, containing text, enabled, and a callback.
- * @package
- */
-Blockly.ContextMenu.commentDuplicateOption = function(comment) {
-  var duplicateOption = {
-    text: Blockly.Msg.DUPLICATE,
-    enabled: true,
-    callback: function() {
-      Blockly.duplicate_(comment);
-    }
-  };
-  return duplicateOption;
-};
-
-/**
- * Make a context menu option for adding a comment on the workspace.
- * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
- *     originated.
- * @param {!Event} e The right-click mouse event.
- * @return {!Object} A menu option, containing text, enabled, and a callback.
- * @package
- */
-Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
-  // Helper function to create and position a comment correctly based on the
-  // location of the mouse event.
-  var addWsComment = function() {
-    // Disable events while this comment is getting created
-    // so that we can fire a single create event for this comment
-    // at the end (instead of CommentCreate followed by CommentMove,
-    // which results in unexpected undo behavior).
-    var disabled = false;
-    if (Blockly.Events.isEnabled()) {
-      Blockly.Events.disable();
-      disabled = true;
-    }
-    var comment = new Blockly.WorkspaceCommentSvg(
-        ws, Blockly.Msg.WORKSPACE_COMMENT_DEFAULT_TEXT,
-        Blockly.WorkspaceCommentSvg.DEFAULT_SIZE,
-        Blockly.WorkspaceCommentSvg.DEFAULT_SIZE, false);
-
-    var injectionDiv = ws.getInjectionDiv();
-    // Bounding rect coordinates are in client coordinates, meaning that they
-    // are in pixels relative to the upper left corner of the visible browser
-    // window.  These coordinates change when you scroll the browser window.
-    var boundingRect = injectionDiv.getBoundingClientRect();
-
-    // The client coordinates offset by the injection div's upper left corner.
-    var clientOffsetPixels = new goog.math.Coordinate(
-        e.clientX - boundingRect.left, e.clientY - boundingRect.top);
-
-    // The offset in pixels between the main workspace's origin and the upper
-    // left corner of the injection div.
-    var mainOffsetPixels = ws.getOriginOffsetInPixels();
-
-    // The position of the new comment in pixels relative to the origin of the
-    // main workspace.
-    var finalOffsetPixels = goog.math.Coordinate.difference(clientOffsetPixels,
-        mainOffsetPixels);
-
-    // The position of the new comment in main workspace coordinates.
-    var finalOffsetMainWs = finalOffsetPixels.scale(1 / ws.scale);
-
-    var commentX = finalOffsetMainWs.x;
-    var commentY = finalOffsetMainWs.y;
-    comment.moveBy(commentX, commentY);
-    if (ws.rendered) {
-      comment.initSvg();
-      comment.render(false);
-      comment.select();
-    }
-    if (disabled) {
-      Blockly.Events.enable();
-    }
-    Blockly.WorkspaceComment.fireCreateEvent(comment);
-  };
-
-  var wsCommentOption = {enabled: true};
-  wsCommentOption.text = Blockly.Msg.ADD_COMMENT;
-  wsCommentOption.callback = function() {
-    addWsComment();
-  };
-  return wsCommentOption;
 };
 
 // End helper functions for creating context menu options.

@@ -184,7 +184,7 @@ Blockly.ScratchBlocks.VerticalExtensions.PROCEDURE_DEF_CONTEXTMENU = {
     }
     // Find and remove the duplicate option
     for (var i = 0, option; option = menuOptions[i]; i++) {
-      if (option.text == Blockly.Msg.DUPLICATE) {
+      if (option.text == Blockly.Msg.DUPLICATE_BLOCK) {
         menuOptions.splice(i, 1);
         break;
       }
