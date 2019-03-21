@@ -29,8 +29,12 @@ goog.provide('Blockly.Flyout');
 goog.require('Blockly.Block');
 goog.require('Blockly.Comment');
 goog.require('Blockly.Events');
+goog.require('Blockly.Events.BlockCreate');
+goog.require('Blockly.Events.VarCreate');
 goog.require('Blockly.FlyoutButton');
+goog.require('Blockly.FlyoutExtensionCategoryHeader');
 goog.require('Blockly.Gesture');
+goog.require('Blockly.scratchBlocksUtils');
 goog.require('Blockly.Touch');
 goog.require('Blockly.WorkspaceSvg');
 goog.require('goog.dom');
@@ -141,6 +145,14 @@ Blockly.Flyout = function(workspaceOptions) {
    * @private
    */
   this.recycleBlocks_ = [];
+
+  /**
+   * List of current highlight boxes drawn in flyout.  Highlight boxes are often used to
+   * visually mark certain group of variables.
+   * @type !Array.<!Blockly.BlockSvg>
+   * @private
+   */
+  this.highlightBoxs_ = [];
 
 };
 
@@ -261,6 +273,14 @@ Blockly.Flyout.prototype.dragAngleRange_ = 70;
  * @type {number}
  */
 Blockly.Flyout.prototype.scrollAnimationFraction = 0.3;
+
+/**
+ * Whether to recycle blocks when refreshing the flyout. When false, do not allow
+ * anything to be recycled. The default is to recycle.
+ * @type {boolean}
+ * @private
+ */
+Blockly.Flyout.prototype.recyclingEnabled_ = true;
 
 /**
  * Creates the flyout's DOM.  Only needs to be called once. The flyout can
@@ -526,6 +546,11 @@ Blockly.Flyout.prototype.show = function(xmlList) {
         } else {
           gaps.push(default_gap);
         }
+      } else if ((tagName == 'LABEL') && (xml.getAttribute('showStatusButton') == 'true')) {
+        var curButton = new Blockly.FlyoutExtensionCategoryHeader(this.workspace_,
+            this.targetWorkspace_, xml);
+        contents.push({type: 'button', button: curButton});
+        gaps.push(default_gap);
       } else if (tagName == 'BUTTON' || tagName == 'LABEL') {
         // Labels behave the same as buttons, but are styled differently.
         var isLabel = tagName == 'LABEL';
@@ -579,12 +604,13 @@ Blockly.Flyout.prototype.emptyRecycleBlocks_ = function() {
 };
 
 /**
- * Store an array of category names, scrollbar positions, and category lengths.
+ * Store an array of category names, ids, scrollbar positions, and category lengths.
  * This is used when scrolling the flyout to cause a category to be selected.
  * @private
  */
 Blockly.Flyout.prototype.recordCategoryScrollPositions_ = function() {
   this.categoryScrollPositions = [];
+  // Record category names and positions using the text label at the top of each one.
   for (var i = 0; i < this.buttons_.length; i++) {
     if (this.buttons_[i].getIsCategoryLabel()) {
       var categoryLabel = this.buttons_[i];
@@ -595,14 +621,24 @@ Blockly.Flyout.prototype.recordCategoryScrollPositions_ = function() {
       });
     }
   }
+  // Record the length of each category, setting the final one to 0.
   var numCategories = this.categoryScrollPositions.length;
-  for (var i = 0; i < numCategories - 1; i++) {
-    var currentPos = this.categoryScrollPositions[i].position;
-    var nextPos = this.categoryScrollPositions[i+1].position;
-    var length = nextPos - currentPos;
-    this.categoryScrollPositions[i].length = length;
+  if (numCategories > 0) {
+    for (var i = 0; i < numCategories - 1; i++) {
+      var currentPos = this.categoryScrollPositions[i].position;
+      var nextPos = this.categoryScrollPositions[i + 1].position;
+      var length = nextPos - currentPos;
+      this.categoryScrollPositions[i].length = length;
+    }
+    this.categoryScrollPositions[numCategories - 1].length = 0;
+    // Record the id of each category.
+    for (var i = 0; i < numCategories; i++) {
+      var category = this.parentToolbox_.getCategoryByIndex(i);
+      if (category && category.id_) {
+        this.categoryScrollPositions[i].categoryId = category.id_;
+      }
+    }
   }
-  this.categoryScrollPositions[numCategories - 1].length = 0;
 };
 
 /**
@@ -621,7 +657,7 @@ Blockly.Flyout.prototype.selectCategoryByScrollPosition = function(pos) {
   // category that the scroll position is beyond.
   for (var i = this.categoryScrollPositions.length - 1; i >= 0; i--) {
     if (workspacePos >= this.categoryScrollPositions[i].position) {
-      this.parentToolbox_.selectCategoryByName(this.categoryScrollPositions[i].categoryName);
+      this.parentToolbox_.selectCategoryById(this.categoryScrollPositions[i].categoryId);
       return;
     }
   }
@@ -669,6 +705,14 @@ Blockly.Flyout.prototype.setScrollPos = function(pos) {
 };
 
 /**
+ * Set whether the flyout can recycle blocks. A value of true allows blocks to be recycled.
+ * @param {boolean} recycle True if recycling is possible.
+ */
+Blockly.Flyout.prototype.setRecyclingEnabled = function(recycle) {
+  this.recyclingEnabled_ = recycle;
+};
+
+/**
  * Delete blocks and background buttons from a previous showing of the flyout.
  * @private
  */
@@ -677,7 +721,8 @@ Blockly.Flyout.prototype.clearOldBlocks_ = function() {
   var oldBlocks = this.workspace_.getTopBlocks(false);
   for (var i = 0, block; block = oldBlocks[i]; i++) {
     if (block.workspace == this.workspace_) {
-      if (block.isRecyclable()) {
+      if (this.recyclingEnabled_ &&
+          Blockly.scratchBlocksUtils.blockIsRecyclable(block)) {
         this.recycleBlock_(block);
       } else {
         block.dispose(false, false);
@@ -883,4 +928,40 @@ Blockly.Flyout.prototype.recycleBlock_ = function(block) {
   var xy = block.getRelativeToSurfaceXY();
   block.moveBy(-xy.x, -xy.y);
   this.recycleBlocks_.push(block);
+};
+
+/**
+ * Display highlighting box for given variables in the workspace.
+ * @param {array} ids IDs of variables to find.
+ */
+Blockly.Flyout.prototype.drawHighlightBox = function(ids) {
+  for ( var i=0; i< ids.length; i++ ) {
+    var id = ids[i];
+    var block = null;
+    var height = 0;
+    if (id) {
+      block = this.workspace_.getBlockById(id);
+      if (!block) {
+        throw 'Tried to highlight variable that does not exist.';
+      }
+    }
+    height = block.getHeightWidth().height;
+    this.highlightBoxs_.push(Blockly.utils.createSvgElement('rect',
+      {'height': height * this.workspace_.scale,
+      'width' : (block.getHeightWidth().width+10) * this.workspace_.scale,
+      'style' : "fill: none;stroke-width:5;stroke:rgb(255,0,0);",
+      'x' : (block.getBoundingRectangle().topLeft.x-5) * this.workspace_.scale,
+      'y' : (block.getBoundingRectangle().topLeft.y-this.getScrollPos()) * this.workspace_.scale
+      },
+      this.svgGroup_));
+  }
+};
+
+/**
+ * Remove all highlighting boxes for given variables in the workspace.
+ */
+Blockly.Flyout.prototype.removeHighlightBox = function() {
+  for ( var i=0; i<this.highlightBoxs_.length; i++ ) {
+    this.highlightBoxs_[i].remove();
+  }
 };
