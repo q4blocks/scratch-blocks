@@ -995,12 +995,19 @@ Blockly.WorkspaceSvg.prototype.glowMessyBlock = function(ids, isMessyGlowingBloc
  * @param {?string} start id ID of block to find.
  * @param {?string} (optional) end id ID of block to find.
  */
-Blockly.WorkspaceSvg.prototype.drawHighlightBox = function(id, id2=null) {
+Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null) {
+  var svg = null;
   var block1 = null, block2 = null;
+
   if (id) {
     block1 = this.getBlockById(id);
     if (!block1) {
       throw 'Tried to highlight block that does not exist.';
+    }
+    if (block1.getFirstStatementConnection()) {
+      svg = block1.getSvgRoot();
+      svg.setAttribute('filter', 'url(#' + 'focusBlocksStackGlowFilter' + ')');
+      //just need to set filter as with other glow
     }
   }
   if (id2) {
@@ -1009,24 +1016,36 @@ Blockly.WorkspaceSvg.prototype.drawHighlightBox = function(id, id2=null) {
       throw 'Tried to highlight block that does not exist.';
     }
   }
-  this.highlightBoxs_.push(Blockly.utils.createSvgElement('path',
-    {
-      'd': Blockly.utils.getBoundingPath(block1,block2),
-      'class': 'blocklyPath blocklyBlockBackground',
-      'stroke': 'black',
-      'style': 'stroke-width: 5px',
-      'fill-opacity': '0',
-      'fill': 'black'
-    },
-    block1.getSvgRoot()));
+  if (!svg) {
+    svg = Blockly.utils.createSvgElement('path',
+      {
+        'd': Blockly.utils.getBoundingPath(block1, block2),
+        'class': 'blocklyBlockBackground',
+        'fill': 'black',
+        'fill-opacity': '0',
+        'stroke': '#73C2FB',
+        // 'stroke-width': '1px',
+      },
+      block1.getSvgRoot());
+      svg.setAttribute('filter', 'url(#' + 'blocklyFocusBlocksGlowFilter' + ')');
+  }
+  this.highlightBoxs_.push(svg);
+
 };
+
 
 /**
  * Remove all highlighting boxes for given block/blocks in the workspace.
  */
-Blockly.WorkspaceSvg.prototype.removeHighlightBox = function() {
-  for ( var i=0; i<this.highlightBoxs_.length; i++ ) {
-    this.highlightBoxs_[i].remove();
+Blockly.WorkspaceSvg.prototype.removeHighlightBox = function () {
+  for (var i = 0; i < this.highlightBoxs_.length; i++) {
+    if(this.highlightBoxs_[i].nodeName==='g'){
+      //just remove the effect if it's the block rootSvg
+      this.highlightBoxs_[i].removeAttribute('filter');
+    }else{
+      // remove the path element itself
+      this.highlightBoxs_[i].remove();
+    }
   }
 };
 
