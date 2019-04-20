@@ -995,7 +995,7 @@ Blockly.WorkspaceSvg.prototype.glowMessyBlock = function(ids, isMessyGlowingBloc
  * @param {?string} start id ID of block to find.
  * @param {?string} (optional) end id ID of block to find.
  */
-Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null) {
+Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null, options) {
   var svg = null;
   var block1 = null, block2 = null;
 
@@ -1008,11 +1008,13 @@ Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null) {
           'class': 'blocklyBlockBackground',
           'fill': 'black',
           'fill-opacity': '0',
-          'stroke': '#73C2FB'
+          'stroke': options?options.color:'#73C2FB',
+          'stroke-width': options?'7px':'1px'
         },
         block1.getSvgRoot());
-        svg.setAttribute('filter', 'url(#' + 'blocklyFocusBlocksGlowFilter' + ')');
-    
+        if(!options){
+          svg.setAttribute('filter', 'url(#' + 'blocklyFocusBlocksGlowFilter' + ')');
+        }
       this.highlightBoxs_.push(svg);
       return;
     }
@@ -1029,14 +1031,16 @@ Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null) {
   
     svg = Blockly.utils.createSvgElement('path',
       {
-        'd': Blockly.utils.getBoundingPath2(block1, block2),
+        'd': Blockly.utils.getBoundingPathForControlBlock(block1, block2),
         'class': 'blocklyBlockBackground',
         'fill': 'black',
         'fill-opacity': '0',
         'stroke': '#73C2FB'
       },
       block1.getSvgRoot());
-      svg.setAttribute('filter', 'url(#' + 'blocklyFocusBlocksGlowFilter' + ')');
+      if(!options){
+        svg.setAttribute('filter', 'url(#' + 'blocklyFocusBlocksGlowFilter' + ')');
+      }
   
   this.highlightBoxs_.push(svg);
 

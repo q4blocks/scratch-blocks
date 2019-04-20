@@ -323,8 +323,9 @@
 
       function highlightBlocksSetup(){ 
         var input = document.getElementById('importExport'); 
-        input.value = 
-        "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='4VP]lLQ0AE2=xn^oKg0P'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='(tX%(fDit^}(5Sr4WL1s'><value name='STEPS'><shadow type='math_number' id='tZ-(GKbYOCr)RhzzM2.+'><field name='NUM'>10</field></shadow></value></block></statement></block></statement></block></xml>" 
+        input.value =
+        "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='4VP]lLQ0AE2=xn^oKg0P'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='(tX%(fDit^}(5Sr4WL1s'><value name='STEPS'><shadow type='math_number' id='tZ-(GKbYOCr)RhzzM2.+'><field name='NUM'>10</field></shadow></value><next><block type='control_repeat' id='b6Q7}8=bg%|;9^?Xtvkc'><value name='TIMES'><shadow type='math_whole_number' id='|I.g-sl%(={gTt,K/fef'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_pointtowards' id='r7HJh#V-%HPvl!qJ9KHd'><value name='TOWARDS'><shadow type='motion_pointtowards_menu' id='r.-#{uNI:QHy|Hc@@qns'><field name='TOWARDS'>_mouse_</field></shadow></value></block></statement></block></next></block></statement><next><block type='control_repeat' id='7Ar/QYEGqbx=SA:rlQB}'><value name='TIMES'><shadow type='math_whole_number' id='mZ^Yc__2TtuoT]8{l;Wy'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='7=++kc;-Ri0!W,I}bs_?'><value name='STEPS'><shadow type='math_number' id='yP-_(23z57Tg(#htpCN|'><field name='NUM'>10</field></shadow></value></block></statement></block></next></block></statement></block></xml>"
+        // "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='4VP]lLQ0AE2=xn^oKg0P'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='(tX%(fDit^}(5Sr4WL1s'><value name='STEPS'><shadow type='math_number' id='tZ-(GKbYOCr)RhzzM2.+'><field name='NUM'>10</field></shadow></value></block></statement></block></statement></block></xml>" 
         // "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='om4}l[GGs`ln2l0mSrmo'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_pointtowards' id='K74{%^ZUgq.+!+5{-1NJ'><value name='TOWARDS'><shadow type='motion_pointtowards_menu' id=')zZC,ShlCvM|k^vEVn(f'><field name='TOWARDS'>_mouse_</field></shadow></value></block></statement></block></statement></block></xml>"
         ; 
         fromXml(); 
@@ -334,7 +335,8 @@
           Blockly.selected.setHintText("abc");
           Blockly.selected.hint.setVisible(true);
         } 
-        workspace.drawHighlightBox('target')
+        workspace.drawHighlightBox('target',undefined,{color:'#92C124'})
+        // workspace.drawHighlightBox('target',null,{color:'#3C91E6'})
       } 
 
       function setLocale(locale) {
