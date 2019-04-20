@@ -1001,7 +1001,7 @@ Blockly.utils.getBoundingPathForControlBlock = function(block){
   
   d = d + pd1[0] + " H" + pd1[1];
   var blockType = block.type.replace("control_","");
-  d = d + Blockly.utils.pathBetweenForControlBlock(block);
+  d = d + Blockly.utils.pathBetweenForControlBlock(block,null, true);
   if(["if","repeat","repeat_until","forever"].includes(blockType)){
     if(["if"].includes(blockType)){
       d = d + " H" + pd1[5] + " H" + pd1[6];
@@ -1021,10 +1021,10 @@ Blockly.utils.getBoundingPathForControlBlock = function(block){
   return d;
 };
 
-Blockly.utils.pathBetweenForControlBlock = function(block1, translate=0){
+Blockly.utils.pathBetweenForControlBlock = function(block1, translate=0, topMost){
   var d = "";
   var block = block1;
-
+  while (block != null){
     var pd = block.svgPath_.getAttribute("d").split(" H");
     pd[2] = pd[2].replace(pd[2].split(" ")[1],parseInt(pd[2].split(" ")[1]) + translate);
     var blockType = block.type.replace("control_","");
@@ -1032,13 +1032,13 @@ Blockly.utils.pathBetweenForControlBlock = function(block1, translate=0){
       pd[5] = pd[5].replace(pd[5].split(" ")[1],parseInt(pd[5].split(" ")[1]) + translate )
       var substack = block.inputList[1].connection ? block.inputList[1].connection.targetConnection.getSourceBlock() : block.inputList[2].connection.targetConnection.getSourceBlock();
       var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
-      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack,  newTranslate)
+      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack,  newTranslate, false)
         + " H" + pd[5];
     } else if(blockType == "if"){
       pd[4] = pd[4].replace(pd[4].split(" ")[1],parseInt(pd[4].split(" ")[1]) + translate )
       var substack = block.inputList[1].connection ? block.inputList[1].connection.targetConnection.getSourceBlock() : block.inputList[2].connection.targetConnection.getSourceBlock();
       var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
-      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack,  newTranslate)
+      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack,  newTranslate, false)
         + " H" + pd[4];
     } else if(blockType == "if_else"){
       pd[5] = pd[5].replace(pd[5].split(" ")[1],parseInt(pd[5].split(" ")[1]) + translate )
@@ -1047,12 +1047,19 @@ Blockly.utils.pathBetweenForControlBlock = function(block1, translate=0){
       var substack2 = block.inputList[4].connection.targetConnection.getSourceBlock();
       var newTranslate1 = parseInt(substack1.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
       var newTranslate2 = parseInt(substack2.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
-      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack1, newTranslate1)
-        + " H" + pd[5] + Blockly.utils.pathBetweenForControlBlock(substack2,  newTranslate2)
+      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack1, newTranslate1, false)
+        + " H" + pd[5] + Blockly.utils.pathBetweenForControlBlock(substack2,  newTranslate2, false)
         + " H" + pd[7];
     }  else {
       d = d + " H" + pd[2];
     }
+
+    if(!topMost){
+      block = block.getNextBlock();
+    }else{
+      block = null;
+    }
+  }
     
   return d;
 };
