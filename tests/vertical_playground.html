@@ -112,8 +112,21 @@
           // Restore flyout event logging state.
           state = sessionStorage.getItem('logFlyoutEvents');
           logFlyoutEvents(Boolean(state));
-          showHintSetup();
+          // showHintSetup();
+          highlightBlocksSetup();
+          svgSetup();
         }
+      }
+
+      function svgSetup(){
+        var svg = document.getElementById('testSvg'); //Get svg element
+        var newElement = document.createElementNS("http://www.w3.org/2000/svg", 'path'); //Create a path in SVG's namespace
+        newElement.setAttribute("d","M 0 0 L 10 10"); //Set path's data
+        newElement.setAttribute("id", "testPath");
+        newElement.style.stroke = "#000"; //Set stroke colour
+        newElement.style.strokeWidth = "5px"; //Set stroke width
+        svg.appendChild(newElement);
+
       }
 
       function getToolboxElement() {
@@ -308,9 +321,12 @@
         }
       }
 
-      function showHintSetup(){ 
+      function highlightBlocksSetup(){ 
         var input = document.getElementById('importExport'); 
-        input.value = "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='motion_movesteps' id='*`#p/~R4kNb@uT|}iU@u' x='525' y='496'><value name='STEPS'><shadow type='math_number' id='{H`(3cDLOp*BR%OM3t1j'><field name='NUM'>10</field></shadow></value></block></xml>"; 
+        input.value = 
+        "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='4VP]lLQ0AE2=xn^oKg0P'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='(tX%(fDit^}(5Sr4WL1s'><value name='STEPS'><shadow type='math_number' id='tZ-(GKbYOCr)RhzzM2.+'><field name='NUM'>10</field></shadow></value></block></statement></block></statement></block></xml>" 
+        // "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='om4}l[GGs`ln2l0mSrmo'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_pointtowards' id='K74{%^ZUgq.+!+5{-1NJ'><value name='TOWARDS'><shadow type='motion_pointtowards_menu' id=')zZC,ShlCvM|k^vEVn(f'><field name='TOWARDS'>_mouse_</field></shadow></value></block></statement></block></statement></block></xml>"
+        ; 
         fromXml(); 
          
         Blockly.selected = workspace.getBlockById('*`#p/~R4kNb@uT|}iU@u'); 
@@ -318,7 +334,7 @@
           Blockly.selected.setHintText("abc");
           Blockly.selected.hint.setVisible(true);
         } 
-        
+        workspace.drawHighlightBox('target')
       } 
 
       function setLocale(locale) {
@@ -600,5 +616,6 @@
       <input id="reportValue" type="text" value="123" />
       <input type="button" value="Report last clicked block" onclick="reportDemo()" />
     </p>
+    <svg id='testSvg'></svg>
   </body>
 </html>
