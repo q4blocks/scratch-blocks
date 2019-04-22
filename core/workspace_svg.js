@@ -1008,7 +1008,7 @@ Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null, opti
           'class': 'blocklyBlockBackground',
           'fill': 'black',
           'fill-opacity': '0',
-          'stroke': options?options.color:'#73C2FB',
+          'stroke': options?options.color:'lightgreen',
           'stroke-width': options?'7px':'1px'
         },
         block1.getSvgRoot());
@@ -1031,11 +1031,12 @@ Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null, opti
   
     svg = Blockly.utils.createSvgElement('path',
       {
-        'd': Blockly.utils.getBoundingPathForControlBlock(block1, block2),
+        'd': Blockly.utils.getBoundingPath(block1, block2),
         'class': 'blocklyBlockBackground',
         'fill': 'black',
         'fill-opacity': '0',
-        'stroke': '#73C2FB'
+        'stroke': 'lightgreen',
+        'stroke-width': options?'7px':'1px'
       },
       block1.getSvgRoot());
       if(!options){

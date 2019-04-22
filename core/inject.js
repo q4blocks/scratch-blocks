@@ -238,7 +238,7 @@ Blockly.createDom_ = function(container, options) {
     componentTransfer2);
   // Color the highlight
   Blockly.utils.createSvgElement('feFlood',
-    {'flood-color': '#73C2FB',
+    {'flood-color': 'lightgreen',
       'flood-opacity': Blockly.Colours.stackGlowOpacity, 
       'result': 'outColor'}, 
       focusBlocksGlowFilter);
@@ -274,7 +274,7 @@ Blockly.createDom_ = function(container, options) {
     componentTransfer2);
   // Color the highlight
   Blockly.utils.createSvgElement('feFlood',
-    {'flood-color': '#73C2FB',
+    {'flood-color': 'lightgreen',
       'flood-opacity': Blockly.Colours.stackGlowOpacity, 
       'result': 'outColor'}, 
       focusBlocksStackGlowFilter);
