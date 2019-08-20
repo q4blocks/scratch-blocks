@@ -22,6 +22,7 @@ Blockly.BlockTransformer.prototype.executeAction = function (action) {
     let result = true;
     try {
         result = this.apply(action);
+        Blockly.Events.fireNow_();
     } catch (err) {
         throw "failed to apply transformation:" +
         JSON.stringify(action)
