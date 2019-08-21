@@ -1063,6 +1063,28 @@ Blockly.WorkspaceSvg.prototype.removeHighlightBox = function () {
   }
 };
 
+
+Blockly.WorkspaceSvg.prototype.highlightField = function (shadowId) {
+  var shadowBlock = null;
+  if(!shadowBlock){
+    shadowBlock = this.getBlockById(shadowId);
+    var fieldPath = shadowBlock.getSvgRoot().querySelector('path');
+    var highlightFieldStyle = document.createAttribute("style");
+    highlightFieldStyle.value = "stroke: limegreen; stroke-width: 5;";
+    fieldPath.attributes.setNamedItem(highlightFieldStyle);
+  }
+};
+
+Blockly.WorkspaceSvg.prototype.unHighlightField = function (shadowId) {
+  var shadowBlock = null;
+  if(!shadowBlock){
+    shadowBlock = this.getBlockById(shadowId);
+    var fieldPath = shadowBlock.getSvgRoot().querySelector('path');
+    fieldPath.attributes.removeNamedItem('style');
+  }
+};
+
+
 /**
  * Glow/unglow a stack in the workspace.
  * @param {?string} id ID of block which starts the stack.
