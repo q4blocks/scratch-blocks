@@ -81,7 +81,7 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
     try {
         let targetBlock = this.workspace.getBlockById(action.target_block);
         let insertedBlock = this.workspace.getBlockById(action.inserted_block);
-        let previousBlock = targetBlock.previousConnection.targetBlock();
+        let previousBlock = targetBlock.previousConnection?targetBlock.previousConnection.targetBlock():null;
         
         let moveEventJsonSpec = null;
 
