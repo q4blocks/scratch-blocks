@@ -41,7 +41,8 @@ Blockly.BlockTransformer.prototype.VarDeclareAction = function (action) {
         type: "var_create",
         varType: "",
         varName: action.name,
-        varId: action.id
+        varId: action.id,
+        isLocal: action.target==='_stage_'?false:true
     };
 
     let varCreateEvent = new Blockly.Events.VarCreate(null);
@@ -51,10 +52,10 @@ Blockly.BlockTransformer.prototype.VarDeclareAction = function (action) {
     return true;
 }
 
-Blockly.BlockTransformer.prototype.VarRename = function (action) {
+Blockly.BlockTransformer.prototype.VarRenameAction = function (action) {
     let varRenameJson = {
         type: "var_rename",
-        varId: action.id,
+        varId: action.var_id,
         oldName: action.oldName,
         newName: action.newName
     };
@@ -211,6 +212,22 @@ Blockly.BlockTransformer.prototype.ReplaceAction = function (action) {
     }
 
 };
+
+Blockly.BlockTransformer.prototype.VarDeleteAction = function (action) {
+    let varDeleteJson = {
+        type: "var_delete",
+        varId: action.var_id,
+        // var_name: action.var_name,
+        // target: action.target
+    };
+
+    let varDeleteEvent = new Blockly.Events.VarDelete(null);
+    varDeleteEvent.id = action.var_id;
+    varDeleteEvent.fromJson(varDeleteJson);
+    varDeleteEvent.workspaceId = this.workspace.id;
+    varDeleteEvent.run(true);
+    return true;
+}
 
 // Blockly.Workspace.prototype.createVariable
 // Blockly.Workspace.prototype.deleteVariableById

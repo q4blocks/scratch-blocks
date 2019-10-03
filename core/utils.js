@@ -976,7 +976,7 @@ Blockly.utils.getBoundingPath = function(block1, block2=null){
     var substack = block2.inputList[1].connection ? block2.inputList[1].connection.targetConnection.getSourceBlock() : block2.inputList[2].connection.targetConnection.getSourceBlock();
     var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]);
     d = d + " H" + pd2[2] + Blockly.utils.pathBetween(substack, null, newTranslate)
-      + " H" + pd2[4];
+      + " H" + pd2[5];
     d = d + " H" + pd2[6] + " H" + pd2[7];
   } else if(block2Type == "if_else"){
     var substack1 = block2.inputList[2].connection.targetConnection.getSourceBlock();
