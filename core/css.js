@@ -1033,7 +1033,7 @@ Blockly.Css.CONTENT = [
     'outline: none;',
     'padding: 4px 0;',
     'position: absolute;',
-    'overflow-y: auto;',
+    'overflow-y: hidden;',
     'overflow-x: hidden;',
     'z-index: 20000;',  /* Arbitrary, but some apps depend on it... */
   '}',

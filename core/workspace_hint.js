@@ -9,6 +9,7 @@ goog.require('Blockly.Icon');
 
 Blockly.WorkspaceHint = function (workspace) {
     this.workspace_ = workspace;
+    this.activeFieldValue = null;
 };
 
 Blockly.WorkspaceHint.prototype.WIDTH_ = 20;
@@ -131,4 +132,9 @@ Blockly.WorkspaceHint.prototype.showContextMenu_ = function (e) {
 
     Blockly.ContextMenu.show(e, menuOptions, this.workspace_.RTL);
 
+}
+
+Blockly.WorkspaceHint.prototype.setActiveFieldValue = function (shadowBlock) {
+    // set activeField (shadowId) attribute in workspaceHint: shadowBlock.id
+    this.activeFieldValue = shadowBlock;
 }

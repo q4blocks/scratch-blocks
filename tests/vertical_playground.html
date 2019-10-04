@@ -112,8 +112,23 @@
           // Restore flyout event logging state.
           state = sessionStorage.getItem('logFlyoutEvents');
           logFlyoutEvents(Boolean(state));
-          showHintSetup();
+          // showHintSetup();
+          highlightBlocksSetup();
+          // highlighFieldSetup();
+          // svgSetup();
+          // transformSetup();
         }
+      }
+
+      function svgSetup(){
+        var svg = document.getElementById('testSvg'); //Get svg element
+        var newElement = document.createElementNS("http://www.w3.org/2000/svg", 'path'); //Create a path in SVG's namespace
+        newElement.setAttribute("d","M 0 0 L 10 10"); //Set path's data
+        newElement.setAttribute("id", "testPath");
+        newElement.style.stroke = "#000"; //Set stroke colour
+        newElement.style.strokeWidth = "5px"; //Set stroke width
+        svg.appendChild(newElement);
+
       }
 
       function getToolboxElement() {
@@ -308,18 +323,49 @@
         }
       }
 
-      function showHintSetup(){ 
+      function transformSetup(){
         var input = document.getElementById('importExport'); 
-        input.value = "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='motion_movesteps' id='*`#p/~R4kNb@uT|}iU@u' x='525' y='496'><value name='STEPS'><shadow type='math_number' id='{H`(3cDLOp*BR%OM3t1j'><field name='NUM'>10</field></shadow></value></block></xml>"; 
+        input.value =
+         "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='event_whenflagclicked' id='__greenflag__' x='94' y='356'><next><block type='motion_pointindirection' id='5D8/lOi*ez?L?]g:Jf16'><value name='DIRECTION'><shadow type='math_angle' id='fdEf3Z{0RgCW|VA`:sWM'><field name='NUM'>90</field></shadow></value><next><block type='motion_gotoxy' id='qkU;n/VdHe*=6#O$BI*w'><value name='X'><shadow type='math_number' id=')|vDEhyVpv^37|86U_p:'><field name='NUM'>0</field></shadow></value><value name='Y'><shadow type='math_number' id=',N.d]yQ5GaEjyW(eqV!5'><field name='NUM'>0</field></shadow></value><next><block type='control_forever' id='[-9M@[PxGGZJ1-qt/frn'><statement name='SUBSTACK'><block type='control_repeat' id='__small-rotation__'><value name='TIMES'><shadow type='math_whole_number' id='41Q24urK5FdwuxP/%R_1'><field name='NUM'>36</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='@g`*zKNybwlqc|VR]eZ1'><value name='STEPS'><shadow type='math_number' id='?L2h~z?Rt}l^pF[%3Bz;'><field name='NUM'>8</field></shadow></value><next><block type='motion_turnright' id='Pv;`~cP%q/2RJl~$dF`r'><value name='DEGREES'><shadow type='math_number' id=':d=7D*9HnQBpVJ:ulBui'><field name='NUM'>10</field></shadow></value></block></next></block></statement><next><block type='control_repeat' id='__large-rotation__'><value name='TIMES'><shadow type='math_whole_number' id='Bh4DS?}@e,(y4u@FcmRG'><field name='NUM'>36</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='z=Q`YbRL`Uc)rxL7}WTV'><value name='STEPS'><shadow type='math_number' id='}X;Ch0|QdXHW`of%*O)u'><field name='NUM'>16</field></shadow></value><next><block type='motion_turnright' id='M8}K:4UF8|z:)i=RQjv2'><value name='DEGREES'><shadow type='math_number' id='Q[LO_[Ba5VN:lHCT@uX['><field name='NUM'>10</field></shadow></value></block></next></block></statement></block></next></block></statement></block></next></block></next></block></next></block></xml>";
+         fromXml(); 
+      }
+
+      function highlightBlocksSetup(){ 
+        var input = document.getElementById('importExport'); 
+        input.value =
+        // "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_repeat' id='g.doko~_@CGO}:Vg/pR-' x='400' y='243'><value name='TIMES'><shadow type='math_whole_number' id='GQlzwk|TLD!EdGg[(?KX'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_pointindirection' id='a;f;(l@Hj`4:n4,3{5yw'><value name='DIRECTION'><shadow type='math_angle' id='Z:9n[Qge@^PwrBQU1EEt'><field name='NUM'>90</field></shadow></value><next><block type='motion_movesteps' id='`!ttdW7uQ~+?pJ#xb@n`'><value name='STEPS'><shadow type='math_number' id='$VPHVYRKV#_5Can3L:ix'><field name='NUM'>10</field></shadow></value><next><block type='motion_turnright' id='1TQo0bqgwh%R+%QOA50o'><value name='DEGREES'><shadow type='math_number' id='{5EY)Ys{XOSLrfnOiCfM'><field name='NUM'>15</field></shadow></value><next><block type='motion_gotoxy' id='!B#W{E)Vm-4=d6s2`,h)'><value name='X'><shadow type='math_number' id='Dg8HWkQ{,OIx/yCn6*1a'><field name='NUM'>0</field></shadow></value><value name='Y'><shadow type='math_number' id='|T!dHKn{@t^_f#Z5#(_S'><field name='NUM'>0</field></shadow></value></block></next></block></next></block></next></block></statement></block></xml>"
+        //"<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='4VP]lLQ0AE2=xn^oKg0P'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='(tX%(fDit^}(5Sr4WL1s'><value name='STEPS'><shadow type='math_number' id='tZ-(GKbYOCr)RhzzM2.+'><field name='NUM'>10</field></shadow></value><next><block type='control_repeat' id='b6Q7}8=bg%|;9^?Xtvkc'><value name='TIMES'><shadow type='math_whole_number' id='|I.g-sl%(={gTt,K/fef'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_pointtowards' id='r7HJh#V-%HPvl!qJ9KHd'><value name='TOWARDS'><shadow type='motion_pointtowards_menu' id='r.-#{uNI:QHy|Hc@@qns'><field name='TOWARDS'>_mouse_</field></shadow></value></block></statement></block></next></block></statement><next><block type='control_repeat' id='7Ar/QYEGqbx=SA:rlQB}'><value name='TIMES'><shadow type='math_whole_number' id='mZ^Yc__2TtuoT]8{l;Wy'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='7=++kc;-Ri0!W,I}bs_?'><value name='STEPS'><shadow type='math_number' id='yP-_(23z57Tg(#htpCN|'><field name='NUM'>10</field></shadow></value></block></statement></block></next></block></statement></block></xml>"
+        // "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='4VP]lLQ0AE2=xn^oKg0P'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='(tX%(fDit^}(5Sr4WL1s'><value name='STEPS'><shadow type='math_number' id='tZ-(GKbYOCr)RhzzM2.+'><field name='NUM'>10</field></shadow></value></block></statement></block></statement></block></xml>" 
+        // "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='control_forever' id='t[$tlt{LdfQ~u|l7~R[`' x='247' y='227'><statement name='SUBSTACK'><block type='control_repeat' id='target'><value name='TIMES'><shadow type='math_whole_number' id='om4}l[GGs`ln2l0mSrmo'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_pointtowards' id='K74{%^ZUgq.+!+5{-1NJ'><value name='TOWARDS'><shadow type='motion_pointtowards_menu' id=')zZC,ShlCvM|k^vEVn(f'><field name='TOWARDS'>_mouse_</field></shadow></value></block></statement></block></statement></block></xml>"
+        "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='motion_turnright' id='Dy;gx(37]2W3a!e[wJQY' x='263' y='351'><value name='DEGREES'><shadow type='math_number' id='Fz^#8b~FRj!d?3-?u-RM'><field name='NUM'>15</field></shadow></value><next><block type='control_repeat' id='|e^K(I@{c_CD)8fhn%+`'><value name='TIMES'><shadow type='math_whole_number' id='`#PLpmX!(,2*+fqXln-u'><field name='NUM'>10</field></shadow></value><statement name='SUBSTACK'><block type='motion_movesteps' id='|4bgvQ1PoT}oXnKeO+`3'><value name='STEPS'><shadow type='math_number' id='|59}n?EH}b1_)hos4ZaI'><field name='NUM'>10</field></shadow></value><next><block type='looks_show' id='x=R81?X?o;psq_EIa=x2'></block></next></block></statement><next><block type='motion_movesteps' id='B,VpHv?0DoA2+V$2qx[}'><value name='STEPS'><shadow type='math_number' id='@rA$DWI1P+kEi@Y9(Yn.'><field name='NUM'>10</field></shadow></value></block></next></block></next></block></xml>"
+        ; 
         fromXml(); 
          
-        Blockly.selected = workspace.getBlockById('*`#p/~R4kNb@uT|}iU@u'); 
-        if (Blockly.selected) { 
-          Blockly.selected.setHintText("abc");
-          Blockly.selected.hint.setVisible(true);
-        } 
-        
-      } 
+//         Blockly.selected = workspace.getBlockById('*`#p/~R4kNb@uT|}iU@u'); 
+//         if (Blockly.selected) { 
+//           Blockly.selected.setHintText("abc");
+//           Blockly.selected.hint.setVisible(true);
+//         } 
+        // workspace.drawHighlightBox('`!ttdW7uQ~+?pJ#xb@n`','1TQo0bqgwh%R+%QOA50o');
+        workspace.drawHighlightBox('Dy;gx(37]2W3a!e[wJQY','|e^K(I@{c_CD)8fhn%+`')
+        // workspace.drawHighlightBox('target',null,{color:'#3C91E6'})
+      }
+
+      function highlighFieldSetup(){
+        var input = document.getElementById('importExport');
+        input.value =
+        "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='looks_seteffectto' id='N$(lwZyb{)yHn|!6*sDM' x='124' y='180'><field name='EFFECT'>COLOR</field><value name='VALUE'><shadow type='math_number' id='qPI5(v*?$FK4-a6xxFY2'><field name='NUM'>185</field></shadow></value></block></xml>"
+        ; 
+        fromXml(); 
+        const shadowId = "qPI5(v*?$FK4-a6xxFY2";
+        var block = workspace.getBlockById("N$(lwZyb{)yHn|!6*sDM");
+        window.block = block;
+
+        // highlight
+        workspace.highlightField('qPI5(v*?$FK4-a6xxFY2');
+        // workspace.unHighlightField('qPI5(v*?$FK4-a6xxFY2');
+
+      }
 
       function setLocale(locale) {
         workspace.getFlyout().setRecyclingEnabled(false);
@@ -600,5 +646,6 @@
       <input id="reportValue" type="text" value="123" />
       <input type="button" value="Report last clicked block" onclick="reportDemo()" />
     </p>
+    <svg id='testSvg'></svg>
   </body>
 </html>

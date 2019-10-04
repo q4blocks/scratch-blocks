@@ -216,6 +216,80 @@ Blockly.createDom_ = function(container, options) {
 
   // copy ends
 
+  // another copy
+  var focusBlocksGlowFilter = Blockly.utils.createSvgElement('filter',
+    {'id': 'blocklyFocusBlocksGlowFilter',
+      'height': '160%', 
+      'width': '180%', 
+      y: '-30%', 
+      x: '-40%'
+    }, 
+    defs);
+
+  options.focusBlocksGlowBlur = Blockly.utils.createSvgElement('feGaussianBlur',
+    {'in': 'SourceGraphic',
+      'stdDeviation': 1.5}, 
+      focusBlocksGlowFilter);
+  // Set all gaussian blur pixels to 1 opacity before applying flood
+  var componentTransfer2 = Blockly.utils.createSvgElement('feComponentTransfer', {'result': 'outBlur'}, focusBlocksGlowFilter);
+  Blockly.utils.createSvgElement('feFuncA',
+    {'type': 'table', 
+    'tableValues': '0' + goog.string.repeat(' 1', 16)}, 
+    componentTransfer2);
+  // Color the highlight
+  Blockly.utils.createSvgElement('feFlood',
+    {'flood-color': 'lightgreen',
+      'flood-opacity': Blockly.Colours.stackGlowOpacity, 
+      'result': 'outColor'}, 
+      focusBlocksGlowFilter);
+  Blockly.utils.createSvgElement('feComposite',
+    {'in': 'outColor', 
+      'in2': 'outBlur',
+      'operator': 'in', 
+      'result': 'outGlow'}, 
+      focusBlocksGlowFilter);
+  Blockly.utils.createSvgElement('feComposite',
+    {'in': 'SourceGraphic', 'in2': 'outGlow', 'operator': 'over'}, focusBlocksGlowFilter);
+  // copy end
+
+  // another copy
+  var focusBlocksStackGlowFilter = Blockly.utils.createSvgElement('filter',
+    {'id': 'focusBlocksStackGlowFilter',
+      'height': '160%', 
+      'width': '180%', 
+      y: '-30%', 
+      x: '-40%'
+    }, 
+    defs);
+
+  options.focusBlocksStackGlowBlur = Blockly.utils.createSvgElement('feGaussianBlur',
+    {'in': 'SourceGraphic',
+      'stdDeviation': 4}, 
+      focusBlocksStackGlowFilter);
+  // Set all gaussian blur pixels to 1 opacity before applying flood
+  var componentTransfer2 = Blockly.utils.createSvgElement('feComponentTransfer', {'result': 'outBlur'}, focusBlocksStackGlowFilter);
+  Blockly.utils.createSvgElement('feFuncA',
+    {'type': 'table', 
+    'tableValues': '0' + goog.string.repeat(' 1', 16)}, 
+    componentTransfer2);
+  // Color the highlight
+  Blockly.utils.createSvgElement('feFlood',
+    {'flood-color': 'lightgreen',
+      'flood-opacity': Blockly.Colours.stackGlowOpacity, 
+      'result': 'outColor'}, 
+      focusBlocksStackGlowFilter);
+  Blockly.utils.createSvgElement('feComposite',
+    {'in': 'outColor', 
+      'in2': 'outBlur',
+      'operator': 'in', 
+      'result': 'outGlow'}, 
+      focusBlocksStackGlowFilter);
+  Blockly.utils.createSvgElement('feComposite',
+    {'in': 'SourceGraphic', 'in2': 'outGlow', 'operator': 'over'}, focusBlocksStackGlowFilter);
+
+
+  // copy end
+
 
   // Filter for replacement marker
   var replacementGlowFilter = Blockly.utils.createSvgElement('filter',

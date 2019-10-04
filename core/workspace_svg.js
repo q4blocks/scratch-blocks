@@ -995,10 +995,29 @@ Blockly.WorkspaceSvg.prototype.glowMessyBlock = function(ids, isMessyGlowingBloc
  * @param {?string} start id ID of block to find.
  * @param {?string} (optional) end id ID of block to find.
  */
-Blockly.WorkspaceSvg.prototype.drawHighlightBox = function(id, id2=null) {
+Blockly.WorkspaceSvg.prototype.drawHighlightBox = function (id, id2 = null, options) {
+  var svg = null;
   var block1 = null, block2 = null;
+
   if (id) {
     block1 = this.getBlockById(id);
+    if (block1.getFirstStatementConnection()&&!block2) {
+      svg = Blockly.utils.createSvgElement('path',
+        {
+          'd': Blockly.utils.getBoundingPathForControlBlock(block1),
+          'class': 'blocklyBlockBackground',
+          'fill': 'black',
+          'fill-opacity': '0',
+          'stroke': options?options.color:'lightgreen',
+          'stroke-width': options?'7px':'1px'
+        },
+        block1.getSvgRoot());
+        if(!options){
+          svg.setAttribute('filter', 'url(#' + 'blocklyFocusBlocksGlowFilter' + ')');
+        }
+      this.highlightBoxs_.push(svg);
+      return;
+    }
     if (!block1) {
       throw 'Tried to highlight block that does not exist.';
     }
@@ -1009,26 +1028,62 @@ Blockly.WorkspaceSvg.prototype.drawHighlightBox = function(id, id2=null) {
       throw 'Tried to highlight block that does not exist.';
     }
   }
-  this.highlightBoxs_.push(Blockly.utils.createSvgElement('path',
-    {
-      'd': Blockly.utils.getBoundingPath(block1,block2),
-      'class': 'blocklyPath blocklyBlockBackground',
-      'stroke': 'black',
-      'style': 'stroke-width: 5px',
-      'fill-opacity': '0',
-      'fill': 'black'
-    },
-    block1.getSvgRoot()));
+  
+    svg = Blockly.utils.createSvgElement('path',
+      {
+        'd': Blockly.utils.getBoundingPath(block1, block2),
+        'class': 'blocklyBlockBackground',
+        'fill': 'black',
+        'fill-opacity': '0',
+        'stroke': 'lightgreen',
+        'stroke-width': options?'7px':'1px'
+      },
+      block1.getSvgRoot());
+      if(!options){
+        svg.setAttribute('filter', 'url(#' + 'blocklyFocusBlocksGlowFilter' + ')');
+      }
+  
+  this.highlightBoxs_.push(svg);
+
 };
+
 
 /**
  * Remove all highlighting boxes for given block/blocks in the workspace.
  */
-Blockly.WorkspaceSvg.prototype.removeHighlightBox = function() {
-  for ( var i=0; i<this.highlightBoxs_.length; i++ ) {
-    this.highlightBoxs_[i].remove();
+Blockly.WorkspaceSvg.prototype.removeHighlightBox = function () {
+  for (var i = 0; i < this.highlightBoxs_.length; i++) {
+    if(this.highlightBoxs_[i].nodeName==='g'){
+      //just remove the effect if it's the block rootSvg
+      this.highlightBoxs_[i].removeAttribute('filter');
+    }else{
+      // remove the path element itself
+      this.highlightBoxs_[i].remove();
+    }
   }
 };
+
+
+Blockly.WorkspaceSvg.prototype.highlightField = function (shadowId) {
+  var shadowBlock = null;
+  if(!shadowBlock){
+    shadowBlock = this.getBlockById(shadowId);
+    var fieldPath = shadowBlock.getSvgRoot().querySelector('path');
+    var highlightFieldStyle = document.createAttribute("style");
+    highlightFieldStyle.value = "stroke: limegreen; stroke-width: 5;";
+    fieldPath.attributes.setNamedItem(highlightFieldStyle);
+  }
+};
+
+Blockly.WorkspaceSvg.prototype.unHighlightField = function (shadowId) {
+  var shadowBlock = null;
+  if(!shadowBlock){
+    shadowBlock = this.getBlockById(shadowId);
+    var fieldPath = shadowBlock.getSvgRoot().querySelector('path');
+    fieldPath.attributes.removeNamedItem('style');
+  }
+};
+
 
 /**
  * Glow/unglow a stack in the workspace.

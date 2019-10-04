@@ -976,7 +976,7 @@ Blockly.utils.getBoundingPath = function(block1, block2=null){
     var substack = block2.inputList[1].connection ? block2.inputList[1].connection.targetConnection.getSourceBlock() : block2.inputList[2].connection.targetConnection.getSourceBlock();
     var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]);
     d = d + " H" + pd2[2] + Blockly.utils.pathBetween(substack, null, newTranslate)
-      + " H" + pd2[4];
+      + " H" + pd2[5];
     d = d + " H" + pd2[6] + " H" + pd2[7];
   } else if(block2Type == "if_else"){
     var substack1 = block2.inputList[2].connection.targetConnection.getSourceBlock();
@@ -993,6 +993,77 @@ Blockly.utils.getBoundingPath = function(block1, block2=null){
   }
   return d;
 };
+
+
+Blockly.utils.getBoundingPathForControlBlock = function(block){
+  var d = "";
+  var pd1 = block.svgPath_.getAttribute("d").split(" H");
+  
+  d = d + pd1[0] + " H" + pd1[1];
+  var blockType = block.type.replace("control_","");
+  d = d + Blockly.utils.pathBetweenForControlBlock(block,null, true);
+  if(["if","repeat","repeat_until","forever"].includes(blockType)){
+    if(["if"].includes(blockType)){
+      d = d + " H" + pd1[5] + " H" + pd1[6];
+    }else if(["forever"].includes(blockType)){
+      d = d + " H" + pd1[6];
+    }else if(["repeat"].includes(blockType)){
+      d = d + " H" + pd1[6] + " H"+ pd1[7];
+    }
+    else{
+      d = d + " H" + pd1[6] + " H" + pd1[7];
+    }
+  } else if(blockType == "if_else"){
+    d = d + " H" + pd1[8] + " H" + pd1[9];
+  } else {
+
+  }
+  return d;
+};
+
+Blockly.utils.pathBetweenForControlBlock = function(block1, translate=0, topMost){
+  var d = "";
+  var block = block1;
+  while (block != null){
+    var pd = block.svgPath_.getAttribute("d").split(" H");
+    pd[2] = pd[2].replace(pd[2].split(" ")[1],parseInt(pd[2].split(" ")[1]) + translate);
+    var blockType = block.type.replace("control_","");
+    if(["repeat","repeat_until","forever"].includes(blockType)){
+      pd[5] = pd[5].replace(pd[5].split(" ")[1],parseInt(pd[5].split(" ")[1]) + translate )
+      var substack = block.inputList[1].connection ? block.inputList[1].connection.targetConnection.getSourceBlock() : block.inputList[2].connection.targetConnection.getSourceBlock();
+      var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack,  newTranslate, false)
+        + " H" + pd[5];
+    } else if(blockType == "if"){
+      pd[4] = pd[4].replace(pd[4].split(" ")[1],parseInt(pd[4].split(" ")[1]) + translate )
+      var substack = block.inputList[1].connection ? block.inputList[1].connection.targetConnection.getSourceBlock() : block.inputList[2].connection.targetConnection.getSourceBlock();
+      var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack,  newTranslate, false)
+        + " H" + pd[4];
+    } else if(blockType == "if_else"){
+      pd[5] = pd[5].replace(pd[5].split(" ")[1],parseInt(pd[5].split(" ")[1]) + translate )
+      pd[7] = pd[7].replace(pd[7].split(" ")[1],parseInt(pd[7].split(" ")[1]) + translate )
+      var substack1 = block.inputList[2].connection.targetConnection.getSourceBlock();
+      var substack2 = block.inputList[4].connection.targetConnection.getSourceBlock();
+      var newTranslate1 = parseInt(substack1.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      var newTranslate2 = parseInt(substack2.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      d = d + " H" + pd[2] + Blockly.utils.pathBetweenForControlBlock(substack1, newTranslate1, false)
+        + " H" + pd[5] + Blockly.utils.pathBetweenForControlBlock(substack2,  newTranslate2, false)
+        + " H" + pd[7];
+    }  else {
+      d = d + " H" + pd[2];
+    }
+
+    if(!topMost){
+      block = block.getNextBlock();
+    }else{
+      block = null;
+    }
+  }
+    
+  return d;
+};
+
 
 /**
  *Returns path string for nested blocks

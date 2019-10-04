@@ -689,6 +689,10 @@ Blockly.Workspace.prototype.showHint = function(){
   }
 }
 
+Blockly.Workspace.prototype.setActiveFieldValue = function(shadowBlock){
+  this.workspaceHint.setActiveFieldValue(shadowBlock);
+}
+
 // Export symbols that would otherwise be renamed by Closure compiler.
 Blockly.Workspace.prototype['clear'] = Blockly.Workspace.prototype.clear;
 Blockly.Workspace.prototype['clearUndo'] =
